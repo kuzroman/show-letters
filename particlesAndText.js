@@ -1,25 +1,77 @@
+"use strict";
+
+(function($){
+    var o = $({});
+    $.subscribe = function() {
+        o.bind.apply(o, arguments);
+    };
+    $.unsubscribe = function() {
+        o.unbind.apply(o, arguments);
+    };
+    $.publish = function() {
+        o.trigger.apply(o, arguments);
+    };
+})(jQuery);
+
+//////////////////////////////////////////////////////////
+
 $(function () {
-    var aim = new engravingText.LoaderLetters();
-    aim.addText();
-    aim.showText();
+    engravingText.init();
 });
 
-engravingText = {};
-engravingText.isLetterDrew = false;
-engravingText.currentX = 0;
-engravingText.currentY = 0;
-engravingText.letters = [];
+window.engravingText = {};
+
+engravingText.p = { // params
+    W: window.innerWidth,
+    H: window.innerHeight,
+    bits: [],
+    isBitsFell: false, // частицы упали?
+    letters: [],
+    bitsSpeed: 15,
+    letterSpeed: 10
+};
+engravingText.p.canvas = document.getElementById('loader');
+engravingText.p.ctx = engravingText.p.canvas.getContext("2d");
+
+
+
+engravingText.init = function () {
+    this.events();
+
+    this.p.canvas.width = this.p.W;
+    this.p.canvas.height = this.p.H;
+
+    var aim = new this.LoaderLetters();
+    aim.addText();
+    aim.showText();
+
+};
+
+engravingText.events = function () {
+    var self = this
+        ,isAnimStarted = false;
+
+    $.subscribe('letterShowed', function (ev, positions) {
+        self.addBits(positions);
+        if (!isAnimStarted) {
+            isAnimStarted = true;
+            self.animationBits();
+        }
+    });
+};
 
 
 engravingText.LoaderLetters = function () {
-    this.speed = 10;
+    this.speed = engravingText.p.letterSpeed || 0;
+    this.x = 0;
+    this.y = 0;
 
     var self = this;
     var typingCenter = $('#typingCenter');
     var box = typingCenter.find('div');
 
     var description = 'Hello, my name is Roman Kuznetsov.|' +
-        'I am a web Front-End Engineer, Back-End Developer and UX enthusiast.|' +
+        'I am a web Front-End Engineer and UX enthusiast.|' +
         'Check out my latest web components and brackets.io extensions at my lab page .|' +
         'Feel free to take a look at my most recent projects on my work page.|' +
         'Also you can stop and say hello at kuzroman@list.ru';
@@ -32,14 +84,14 @@ engravingText.LoaderLetters = function () {
             else el = $('<i>').text(description[i]);
             box.append(el);
             if (len-1 <= i) {
-                engravingText.letters = this.createAims();
+                engravingText.p.letters = this.createAims();
             }
         }
     };
 
     this.showText = function () {
         var i = 0, isInt
-            ,letters = engravingText.letters
+            ,letters = engravingText.p.letters
             ,len = letters.length
             ;
 
@@ -47,21 +99,13 @@ engravingText.LoaderLetters = function () {
             // draw letters
             if (i <= len-1) {
                 letters[i]['el'].css({opacity:1});
-                engravingText.currentX = letters[i].x1;
-                engravingText.currentY = letters[i].y2;
-            }
-            else {
-                engravingText.isLetterDrew = true;
+                self.x = letters[i].x1;
+                self.y = letters[i].y2;
+
+                $.publish('letterShowed', {x:self.x, y:self.y});
             }
 
-            // bits falling
-            if (!engravingText.isBitsFell) {
-                engravingText.clearCanvas();
-                engravingText.updateBit();
-            }
-            else {
-                clearInterval(isInt);
-            }
+            if (engravingText.p.isBitsFell) clearInterval(isInt);
 
             i++;
         }, this.speed);
@@ -86,62 +130,54 @@ engravingText.LoaderLetters = function () {
 };
 
 
-var W = window.innerWidth
-    ,H = window.innerHeight
-    ,bits = []
-    ,canvas = document.getElementById('loader')
-    ,ctx = canvas.getContext("2d")
-    ;
-
-canvas.width = W;
-canvas.height = H;
+/////////////////////////////////////////////////////////////
 
 
-engravingText.Bit = function () {
+engravingText.addBits = function (positions) {
+    for (var i = 0; i < 3; i++) {
+        var bit = new this.Bit(positions.x, positions.y);
+        this.p.bits.push(bit);
+    }
+};
+engravingText.animationBits = function () {
+    setInterval(function () {
+        engravingText.clearCanvas();
+        engravingText.updateBit();
+    },this.p.bitsSpeed)
+};
 
-    this.x = engravingText.currentX;
-    this.y = engravingText.currentY;
+engravingText.Bit = function (currentX, currentY) {
+    this.x = currentX || 0;
+    this.y = currentY || 0;
+    var p = engravingText.p;
 
     this.g = -Math.round( Math.random() * 50) / 10;
 
     this.draw = function () {
-        ctx.fillStyle = '#fff';
-        var size = Math.random() * 3 + 1; // 1 - 3
-        ctx.fillRect(this.x, this.y, size, size);
-        //console.log(this.x, this.y);
+        p.ctx.fillStyle = '#fff';
+        var size = Math.random() * 3 + 1;
+        p.ctx.fillRect(this.x, this.y, size, size);
     }
 };
 
 engravingText.clearCanvas = function () {
-    ctx.fillStyle = "#272822"; // bg for canvas
-    ctx.fillRect(0, 0, W, H);
+    this.p.ctx.fillStyle = "#272822";
+    this.p.ctx.fillRect(0, 0, this.p.W, this.p.H);
 };
 
-engravingText.updateBit = function () {
-
-    if (!engravingText.isLetterDrew)
-        for (var i = 0; i < 3; i++) {
-            var bit = new engravingText.Bit();
-            bits.push(bit);
-        }
+engravingText.updateBit = function (currentX, currentY) {
+    var bits = this.p.bits;
 
     for (var j = 0; j < bits.length; j++) {
         var b = bits[j];
-        //console.log(b.y, b.g);
         b.y -= b.g;
         b.g -= 0.1;
 
-        if (H < b.y) bits.splice(j,1);
+        if (this.p.H < b.y) bits.splice(j,1);
         b.draw();
     }
 
     if (!bits.length) {
-        engravingText.isBitsFell = true;
+        this.p.isBitsFell = true;
     }
-};
-
-
-engravingText.isBitsFell = false;
-window.onclick = function() {
-    engravingText.isBitsFell = !engravingText.isBitsFell;
 };
