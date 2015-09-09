@@ -1,4 +1,3 @@
 # Engrave text
 
-JavaScript code for animation text
-for create effect of engrave with particles
+JavaScript and canvas code for animation text with effect of engrave
