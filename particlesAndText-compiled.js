@@ -66,14 +66,15 @@ engravingText.LoaderLetters = function () {
     var typingCenter = $('#typingCenter');
     var box = typingCenter.find('div');
 
-    var description = 'Hello, my name is Roman Kuznetsov.|' + 'I am a web Front-End Engineer and UX enthusiast.|' + 'Check out my latest web components and brackets.io extensions at my lab page .|' + 'Feel free to take a look at my most recent projects on my work page.|' + 'Also you can stop and say hello at kuzroman@list.ru';
+    var description = "Hello, my name is Roman Kuznetsov.|\n        I am a web Front-End Engineer and UX enthusiast.|\n        Check out my latest web components and brackets.io extensions at my lab page .|\n        Feel free to take a look at my most recent projects on my work page.|\n        Also you can stop and say hello at kuzroman@list.ru";
 
     this.addText = function () {
-        var el,
+        var el = undefined,
             len = description.length;
         box.html('');
         for (var i = 0; i < len; i++) {
             if (description[i] == '|') el = $('<br>');else el = $('<i>').text(description[i]);
+            //box.append(description[i]);
             box.append(el);
             if (len - 1 <= i) {
                 engravingText.p.letters = this.createAims();
@@ -85,7 +86,7 @@ engravingText.LoaderLetters = function () {
         var _this2 = this;
 
         var i = 0,
-            isInt,
+            isInt = undefined,
             letters = engravingText.p.letters,
             len = letters.length;
 
@@ -126,8 +127,8 @@ engravingText.LoaderLetters = function () {
 /////////////////////////////////////////////////////////////
 
 engravingText.addBits = function (positions) {
-    for (var i = 0; i < 3; i++) {
-        var bit = new this.Bit(positions.x, positions.y);
+    for (var i = 0, bit = undefined; i < 3; i++) {
+        bit = new this.Bit(positions.x, positions.y);
         this.p.bits.push(bit);
     }
 };
@@ -160,8 +161,8 @@ engravingText.clearCanvas = function () {
 engravingText.updateBit = function () {
     var bits = this.p.bits;
 
-    for (var j = 0; j < bits.length; j++) {
-        var b = bits[j];
+    for (var j = 0, b = undefined; j < bits.length; j++) {
+        b = bits[j];
         b.y -= b.g;
         b.g -= 0.1;
 

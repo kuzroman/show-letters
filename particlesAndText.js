@@ -1,7 +1,7 @@
 "use strict";
 
 (function($){
-    var o = $({});
+    let o = $({});
     $.subscribe = function() {
         o.bind.apply(o, arguments);
     };
@@ -41,14 +41,14 @@ engravingText.init = function () {
     this.p.canvas.width = this.p.W;
     this.p.canvas.height = this.p.H;
 
-    var aim = new this.LoaderLetters();
+    let aim = new this.LoaderLetters();
     aim.addText();
     aim.showText();
 
 };
 
 engravingText.events = function () {
-    var isAnimStarted = false;
+    let isAnimStarted = false;
 
     $.subscribe('letterShowed', (ev, positions) => {
         this.addBits(positions);
@@ -65,21 +65,22 @@ engravingText.LoaderLetters = function () {
     this.x = 0;
     this.y = 0;
 
-    var typingCenter = $('#typingCenter');
-    var box = typingCenter.find('div');
+    let typingCenter = $('#typingCenter');
+    let box = typingCenter.find('div');
 
-    var description = 'Hello, my name is Roman Kuznetsov.|' +
-        'I am a web Front-End Engineer and UX enthusiast.|' +
-        'Check out my latest web components and brackets.io extensions at my lab page .|' +
-        'Feel free to take a look at my most recent projects on my work page.|' +
-        'Also you can stop and say hello at kuzroman@list.ru';
+    let description = `Hello, my name is Roman Kuznetsov.|
+        I am a web Front-End Engineer and UX enthusiast.|
+        Check out my latest web components and brackets.io extensions at my lab page .|
+        Feel free to take a look at my most recent projects on my work page.|
+        Also you can stop and say hello at kuzroman@list.ru`;
 
     this.addText = function () {
-        var el, len = description.length;
+        let el, len = description.length;
         box.html('');
-        for (var i = 0; i < len; i++) {
+        for (let i = 0; i < len; i++) {
             if (description[i] == '|') el = $('<br>');
             else el = $('<i>').text(description[i]);
+            //box.append(description[i]);
             box.append(el);
             if (len-1 <= i) {
                 engravingText.p.letters = this.createAims();
@@ -88,7 +89,7 @@ engravingText.LoaderLetters = function () {
     };
 
     this.showText = function () {
-        var i = 0, isInt
+        let i = 0, isInt
             ,letters = engravingText.p.letters
             ,len = letters.length
             ;
@@ -111,9 +112,9 @@ engravingText.LoaderLetters = function () {
     };
 
     this.createAims = function () {
-        var objList = [];
+        let objList = [];
         typingCenter.find('i').each(function (n) {
-            var s = $(this); // s = symbol
+            let s = $(this); // s = symbol
 
             objList[n] = {
                 el: s,
@@ -133,8 +134,8 @@ engravingText.LoaderLetters = function () {
 
 
 engravingText.addBits = function (positions) {
-    for (var i = 0; i < 3; i++) {
-        var bit = new this.Bit(positions.x, positions.y);
+    for (let i = 0, bit; i < 3; i++) {
+        bit = new this.Bit(positions.x, positions.y);
         this.p.bits.push(bit);
     }
 };
@@ -148,13 +149,13 @@ engravingText.animationBits = function () {
 engravingText.Bit = function (currentX, currentY) {
     this.x = currentX || 0;
     this.y = currentY || 0;
-    var p = engravingText.p;
+    let p = engravingText.p;
 
     this.g = -Math.round( Math.random() * 50) / 10;
 
     this.draw = function () {
         p.ctx.fillStyle = '#fff';
-        var size = Math.random() * 3 + 1;
+        let size = Math.random() * 3 + 1;
         p.ctx.fillRect(this.x, this.y, size, size);
     }
 };
@@ -165,10 +166,10 @@ engravingText.clearCanvas = function () {
 };
 
 engravingText.updateBit = function () {
-    var bits = this.p.bits;
+    let bits = this.p.bits;
 
-    for (var j = 0; j < bits.length; j++) {
-        var b = bits[j];
+    for (let j = 0, b; j < bits.length; j++) {
+        b = bits[j];
         b.y -= b.g;
         b.g -= 0.1;
 
