@@ -1,14 +1,14 @@
 "use strict";
 
-(function($){
+(function ($) {
     var o = $({});
-    $.subscribe = function() {
+    $.subscribe = function () {
         o.bind.apply(o, arguments);
     };
-    $.unsubscribe = function() {
+    $.unsubscribe = function () {
         o.unbind.apply(o, arguments);
     };
-    $.publish = function() {
+    $.publish = function () {
         o.trigger.apply(o, arguments);
     };
 })(jQuery);
@@ -25,15 +25,13 @@ engravingText.p = { // params
     W: window.innerWidth,
     H: window.innerHeight,
     bits: [],
-    isBitsFell: false, // частицы упали?
+    isBitsFell: false, // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ?
     letters: [],
     bitsSpeed: 15,
     letterSpeed: 10
 };
 engravingText.p.canvas = document.getElementById('loader');
 engravingText.p.ctx = engravingText.p.canvas.getContext("2d");
-
-
 
 engravingText.init = function () {
     this.events();
@@ -44,21 +42,21 @@ engravingText.init = function () {
     var aim = new this.LoaderLetters();
     aim.addText();
     aim.showText();
-
 };
 
 engravingText.events = function () {
+    var _this = this;
+
     var isAnimStarted = false;
 
-    $.subscribe('letterShowed', (ev, positions) => {
-        this.addBits(positions);
+    $.subscribe('letterShowed', function (ev, positions) {
+        _this.addBits(positions);
         if (!isAnimStarted) {
             isAnimStarted = true;
-            this.animationBits();
+            _this.animationBits();
         }
     });
 };
-
 
 engravingText.LoaderLetters = function () {
     this.speed = engravingText.p.letterSpeed || 0;
@@ -68,46 +66,43 @@ engravingText.LoaderLetters = function () {
     var typingCenter = $('#typingCenter');
     var box = typingCenter.find('div');
 
-    var description = 'Hello, my name is Roman Kuznetsov.|' +
-        'I am a web Front-End Engineer and UX enthusiast.|' +
-        'Check out my latest web components and brackets.io extensions at my lab page .|' +
-        'Feel free to take a look at my most recent projects on my work page.|' +
-        'Also you can stop and say hello at kuzroman@list.ru';
+    var description = 'Hello, my name is Roman Kuznetsov.|' + 'I am a web Front-End Engineer and UX enthusiast.|' + 'Check out my latest web components and brackets.io extensions at my lab page .|' + 'Feel free to take a look at my most recent projects on my work page.|' + 'Also you can stop and say hello at kuzroman@list.ru';
 
     this.addText = function () {
-        var el, len = description.length;
+        var el,
+            len = description.length;
         box.html('');
         for (var i = 0; i < len; i++) {
-            if (description[i] == '|') el = $('<br>');
-            else el = $('<i>').text(description[i]);
+            if (description[i] == '|') el = $('<br>');else el = $('<i>').text(description[i]);
             box.append(el);
-            if (len-1 <= i) {
+            if (len - 1 <= i) {
                 engravingText.p.letters = this.createAims();
             }
         }
     };
 
     this.showText = function () {
-        var i = 0, isInt
-            ,letters = engravingText.p.letters
-            ,len = letters.length
-            ;
+        var _this2 = this;
 
-        isInt = setInterval( () => {
+        var i = 0,
+            isInt,
+            letters = engravingText.p.letters,
+            len = letters.length;
+
+        isInt = setInterval(function () {
             // draw letters
-            if (i <= len-1) {
-                letters[i]['el'].css({opacity:1});
-                this.x = letters[i].x1;
-                this.y = letters[i].y2;
+            if (i <= len - 1) {
+                letters[i]['el'].css({ opacity: 1 });
+                _this2.x = letters[i].x1;
+                _this2.y = letters[i].y2;
 
-                $.publish('letterShowed', {x:this.x, y:this.y} );
+                $.publish('letterShowed', { x: _this2.x, y: _this2.y });
             }
 
             if (engravingText.p.isBitsFell) clearInterval(isInt);
 
             i++;
         }, this.speed);
-
     };
 
     this.createAims = function () {
@@ -118,19 +113,17 @@ engravingText.LoaderLetters = function () {
             objList[n] = {
                 el: s,
                 killed: false,
-                x1: ~~s.offset().left,
-                x2: ~~( s.offset().left + s.width() ),
-                y1: ~~s.offset().top,
-                y2: ~~( s.offset().top + s.height() )
+                x1: ~ ~s.offset().left,
+                x2: ~ ~(s.offset().left + s.width()),
+                y1: ~ ~s.offset().top,
+                y2: ~ ~(s.offset().top + s.height())
             };
         });
         return objList;
     };
 };
 
-
 /////////////////////////////////////////////////////////////
-
 
 engravingText.addBits = function (positions) {
     for (var i = 0; i < 3; i++) {
@@ -139,10 +132,10 @@ engravingText.addBits = function (positions) {
     }
 };
 engravingText.animationBits = function () {
-    setInterval( () => {
+    setInterval(function () {
         engravingText.clearCanvas();
         engravingText.updateBit();
-    },this.p.bitsSpeed)
+    }, this.p.bitsSpeed);
 };
 
 engravingText.Bit = function (currentX, currentY) {
@@ -150,13 +143,13 @@ engravingText.Bit = function (currentX, currentY) {
     this.y = currentY || 0;
     var p = engravingText.p;
 
-    this.g = -Math.round( Math.random() * 50) / 10;
+    this.g = -Math.round(Math.random() * 50) / 10;
 
     this.draw = function () {
         p.ctx.fillStyle = '#fff';
         var size = Math.random() * 3 + 1;
         p.ctx.fillRect(this.x, this.y, size, size);
-    }
+    };
 };
 
 engravingText.clearCanvas = function () {
@@ -172,7 +165,7 @@ engravingText.updateBit = function () {
         b.y -= b.g;
         b.g -= 0.1;
 
-        if (this.p.H < b.y) bits.splice(j,1);
+        if (this.p.H < b.y) bits.splice(j, 1);
         b.draw();
     }
 
@@ -180,3 +173,5 @@ engravingText.updateBit = function () {
         this.p.isBitsFell = true;
     }
 };
+
+//# sourceMappingURL=particlesAndText-compiled.js.map
