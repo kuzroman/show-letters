@@ -59,36 +59,33 @@ engravingText.events = function () {
     });
 };
 
+engravingText.LoaderLetters = class {
+    constructor () {
+        this.speed = engravingText.p.letterSpeed || 0;
+        this.x = 0;
+        this.y = 0;
 
-engravingText.LoaderLetters = function () {
-    this.speed = engravingText.p.letterSpeed || 0;
-    this.x = 0;
-    this.y = 0;
-
-    let typingCenter = $('#typingCenter');
-    let box = typingCenter.find('div');
-
-    let description = `Hello, my name is Roman Kuznetsov.|
+        this.typingCenter = $('#typingCenter');
+        this.box = this.typingCenter.find('div');
+        this.description = `Hello, my name is Roman Kuznetsov.|
         I am a web Front-End Engineer and UX enthusiast.|
         Check out my latest web components and brackets.io extensions at my lab page .|
         Feel free to take a look at my most recent projects on my work page.|
         Also you can stop and say hello at kuzroman@list.ru`;
-
-    this.addText = function () {
-        let el, len = description.length;
-        box.html('');
+    }
+    addText () {
+        let el, len = this.description.length;
+        this.box.html('');
         for (let i = 0; i < len; i++) {
-            if (description[i] == '|') el = $('<br>');
-            else el = $('<i>').text(description[i]);
-            //box.append(description[i]);
-            box.append(el);
+            if (this.description[i] == '|') el = $('<br>');
+            else el = $('<i>').text(this.description[i]);
+            this.box.append(el);
             if (len-1 <= i) {
                 engravingText.p.letters = this.createAims();
             }
         }
-    };
-
-    this.showText = function () {
+    }
+    showText () {
         let i = 0, isInt
             ,letters = engravingText.p.letters
             ,len = letters.length
@@ -109,11 +106,10 @@ engravingText.LoaderLetters = function () {
             i++;
         }, this.speed);
 
-    };
-
-    this.createAims = function () {
+    }
+    createAims () {
         let objList = [];
-        typingCenter.find('i').each(function (n) {
+        this.typingCenter.find('i').each(function (n) {
             let s = $(this); // s = symbol
 
             objList[n] = {
@@ -126,7 +122,7 @@ engravingText.LoaderLetters = function () {
             };
         });
         return objList;
-    };
+    }
 };
 
 
@@ -146,14 +142,17 @@ engravingText.animationBits = function () {
     },this.p.bitsSpeed)
 };
 
-engravingText.Bit = function (currentX, currentY) {
-    this.x = currentX || 0;
-    this.y = currentY || 0;
-    let p = engravingText.p;
 
-    this.g = -Math.round( Math.random() * 50) / 10;
+engravingText.Bit = class {
+    constructor (currentX, currentY) {
+        this.x = currentX || 0;
+        this.y = currentY || 0;
 
-    this.draw = function () {
+        this.g = -Math.round( Math.random() * 50) / 10; // gravity
+    }
+
+    draw () {
+        let p = engravingText.p;
         p.ctx.fillStyle = '#fff';
         let size = Math.random() * 3 + 1;
         p.ctx.fillRect(this.x, this.y, size, size);

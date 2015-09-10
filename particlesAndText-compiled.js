@@ -1,5 +1,9 @@
 "use strict";
 
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 (function ($) {
     var o = $({});
     $.subscribe = function () {
@@ -58,71 +62,80 @@ engravingText.events = function () {
     });
 };
 
-engravingText.LoaderLetters = function () {
-    this.speed = engravingText.p.letterSpeed || 0;
-    this.x = 0;
-    this.y = 0;
+engravingText.LoaderLetters = (function () {
+    function _class() {
+        _classCallCheck(this, _class);
 
-    var typingCenter = $('#typingCenter');
-    var box = typingCenter.find('div');
+        this.speed = engravingText.p.letterSpeed || 0;
+        this.x = 0;
+        this.y = 0;
 
-    var description = "Hello, my name is Roman Kuznetsov.|\n        I am a web Front-End Engineer and UX enthusiast.|\n        Check out my latest web components and brackets.io extensions at my lab page .|\n        Feel free to take a look at my most recent projects on my work page.|\n        Also you can stop and say hello at kuzroman@list.ru";
+        this.typingCenter = $('#typingCenter');
+        this.box = this.typingCenter.find('div');
+        this.description = "Hello, my name is Roman Kuznetsov.|\n        I am a web Front-End Engineer and UX enthusiast.|\n        Check out my latest web components and brackets.io extensions at my lab page .|\n        Feel free to take a look at my most recent projects on my work page.|\n        Also you can stop and say hello at kuzroman@list.ru";
+    }
 
-    this.addText = function () {
-        var el = undefined,
-            len = description.length;
-        box.html('');
-        for (var i = 0; i < len; i++) {
-            if (description[i] == '|') el = $('<br>');else el = $('<i>').text(description[i]);
-            //box.append(description[i]);
-            box.append(el);
-            if (len - 1 <= i) {
-                engravingText.p.letters = this.createAims();
+    _createClass(_class, [{
+        key: "addText",
+        value: function addText() {
+            var el = undefined,
+                len = this.description.length;
+            this.box.html('');
+            for (var i = 0; i < len; i++) {
+                if (this.description[i] == '|') el = $('<br>');else el = $('<i>').text(this.description[i]);
+                this.box.append(el);
+                if (len - 1 <= i) {
+                    engravingText.p.letters = this.createAims();
+                }
             }
         }
-    };
+    }, {
+        key: "showText",
+        value: function showText() {
+            var _this2 = this;
 
-    this.showText = function () {
-        var _this2 = this;
+            var i = 0,
+                isInt = undefined,
+                letters = engravingText.p.letters,
+                len = letters.length;
 
-        var i = 0,
-            isInt = undefined,
-            letters = engravingText.p.letters,
-            len = letters.length;
+            isInt = setInterval(function () {
+                // draw letters
+                if (i <= len - 1) {
+                    letters[i]['el'].css({ opacity: 1 });
+                    _this2.x = letters[i].x1;
+                    _this2.y = letters[i].y2;
 
-        isInt = setInterval(function () {
-            // draw letters
-            if (i <= len - 1) {
-                letters[i]['el'].css({ opacity: 1 });
-                _this2.x = letters[i].x1;
-                _this2.y = letters[i].y2;
+                    $.publish('letterShowed', { x: _this2.x, y: _this2.y });
+                }
 
-                $.publish('letterShowed', { x: _this2.x, y: _this2.y });
-            }
+                if (engravingText.p.isBitsFell) clearInterval(isInt);
 
-            if (engravingText.p.isBitsFell) clearInterval(isInt);
+                i++;
+            }, this.speed);
+        }
+    }, {
+        key: "createAims",
+        value: function createAims() {
+            var objList = [];
+            this.typingCenter.find('i').each(function (n) {
+                var s = $(this); // s = symbol
 
-            i++;
-        }, this.speed);
-    };
+                objList[n] = {
+                    el: s,
+                    killed: false,
+                    x1: ~ ~s.offset().left,
+                    x2: ~ ~(s.offset().left + s.width()),
+                    y1: ~ ~s.offset().top,
+                    y2: ~ ~(s.offset().top + s.height())
+                };
+            });
+            return objList;
+        }
+    }]);
 
-    this.createAims = function () {
-        var objList = [];
-        typingCenter.find('i').each(function (n) {
-            var s = $(this); // s = symbol
-
-            objList[n] = {
-                el: s,
-                killed: false,
-                x1: ~ ~s.offset().left,
-                x2: ~ ~(s.offset().left + s.width()),
-                y1: ~ ~s.offset().top,
-                y2: ~ ~(s.offset().top + s.height())
-            };
-        });
-        return objList;
-    };
-};
+    return _class;
+})();
 
 /////////////////////////////////////////////////////////////
 
@@ -139,19 +152,28 @@ engravingText.animationBits = function () {
     }, this.p.bitsSpeed);
 };
 
-engravingText.Bit = function (currentX, currentY) {
-    this.x = currentX || 0;
-    this.y = currentY || 0;
-    var p = engravingText.p;
+engravingText.Bit = (function () {
+    function _class2(currentX, currentY) {
+        _classCallCheck(this, _class2);
 
-    this.g = -Math.round(Math.random() * 50) / 10;
+        this.x = currentX || 0;
+        this.y = currentY || 0;
 
-    this.draw = function () {
-        p.ctx.fillStyle = '#fff';
-        var size = Math.random() * 3 + 1;
-        p.ctx.fillRect(this.x, this.y, size, size);
-    };
-};
+        this.g = -Math.round(Math.random() * 50) / 10; // gravity
+    }
+
+    _createClass(_class2, [{
+        key: "draw",
+        value: function draw() {
+            var p = engravingText.p;
+            p.ctx.fillStyle = '#fff';
+            var size = Math.random() * 3 + 1;
+            p.ctx.fillRect(this.x, this.y, size, size);
+        }
+    }]);
+
+    return _class2;
+})();
 
 engravingText.clearCanvas = function () {
     this.p.ctx.fillStyle = "#272822";
