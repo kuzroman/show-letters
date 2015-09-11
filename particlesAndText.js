@@ -15,12 +15,6 @@
 
 //////////////////////////////////////////////////////////
 
-//var isPaused = false;
-//window.onclick = function() {
-//    isPaused = !isPaused;
-//};
-
-
 $(function () {
     engravingText.init();
 });
@@ -31,7 +25,7 @@ engravingText.p = { // params
     W: window.innerWidth,
     H: window.innerHeight,
     bits: [],
-    isBitsFell: false, // частицы упали?
+    isBitsFell: false,
     letters: [],
     bitsSpeed: 15,
     letterSpeed: 10
