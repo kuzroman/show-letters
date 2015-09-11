@@ -19,6 +19,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 //////////////////////////////////////////////////////////
 
+//var isPaused = false;
+//window.onclick = function() {
+//    isPaused = !isPaused;
+//};
+
 $(function () {
     engravingText.init();
 });
@@ -72,7 +77,7 @@ engravingText.LoaderLetters = (function () {
 
         this.typingCenter = $('#typingCenter');
         this.box = this.typingCenter.find('div');
-        this.description = "Hello, my name is Roman Kuznetsov.|\n        I am a web Front-End Engineer and UX enthusiast.|\n        Check out my latest web components and brackets.io extensions at my lab page .|\n        Feel free to take a look at my most recent projects on my work page.|\n        Also you can stop and say hello at kuzroman@list.ru";
+        this.description = $('#represent').text();
     }
 
     _createClass(_class, [{
@@ -147,6 +152,7 @@ engravingText.addBits = function (positions) {
 };
 engravingText.animationBits = function () {
     setInterval(function () {
+        //if (isPaused) return;
         engravingText.clearCanvas();
         engravingText.updateBit();
     }, this.p.bitsSpeed);
@@ -158,7 +164,6 @@ engravingText.Bit = (function () {
 
         this.x = currentX || 0;
         this.y = currentY || 0;
-
         this.g = -Math.round(Math.random() * 50) / 10; // gravity
     }
 

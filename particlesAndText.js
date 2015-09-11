@@ -1,19 +1,25 @@
 "use strict";
 
-(function($){
+(function ($) {
     let o = $({});
-    $.subscribe = function() {
+    $.subscribe = function () {
         o.bind.apply(o, arguments);
     };
-    $.unsubscribe = function() {
+    $.unsubscribe = function () {
         o.unbind.apply(o, arguments);
     };
-    $.publish = function() {
+    $.publish = function () {
         o.trigger.apply(o, arguments);
     };
 })(jQuery);
 
 //////////////////////////////////////////////////////////
+
+//var isPaused = false;
+//window.onclick = function() {
+//    isPaused = !isPaused;
+//};
+
 
 $(function () {
     engravingText.init();
@@ -32,7 +38,6 @@ engravingText.p = { // params
 };
 engravingText.p.canvas = document.getElementById('loader');
 engravingText.p.ctx = engravingText.p.canvas.getContext("2d");
-
 
 
 engravingText.init = function () {
@@ -60,45 +65,43 @@ engravingText.events = function () {
 };
 
 engravingText.LoaderLetters = class {
-    constructor () {
+    constructor() {
         this.speed = engravingText.p.letterSpeed || 0;
         this.x = 0;
         this.y = 0;
 
         this.typingCenter = $('#typingCenter');
         this.box = this.typingCenter.find('div');
-        this.description = `Hello, my name is Roman Kuznetsov.|
-        I am a web Front-End Engineer and UX enthusiast.|
-        Check out my latest web components and brackets.io extensions at my lab page .|
-        Feel free to take a look at my most recent projects on my work page.|
-        Also you can stop and say hello at kuzroman@list.ru`;
+        this.description = $('#represent').text();
     }
-    addText () {
+
+    addText() {
         let el, len = this.description.length;
         this.box.html('');
         for (let i = 0; i < len; i++) {
             if (this.description[i] == '|') el = $('<br>');
             else el = $('<i>').text(this.description[i]);
             this.box.append(el);
-            if (len-1 <= i) {
+            if (len - 1 <= i) {
                 engravingText.p.letters = this.createAims();
             }
         }
     }
-    showText () {
+
+    showText() {
         let i = 0, isInt
-            ,letters = engravingText.p.letters
-            ,len = letters.length
+            , letters = engravingText.p.letters
+            , len = letters.length
             ;
 
-        isInt = setInterval( () => {
+        isInt = setInterval(() => {
             // draw letters
-            if (i <= len-1) {
-                letters[i]['el'].css({opacity:1});
+            if (i <= len - 1) {
+                letters[i]['el'].css({opacity: 1});
                 this.x = letters[i].x1;
                 this.y = letters[i].y2;
 
-                $.publish('letterShowed', {x:this.x, y:this.y} );
+                $.publish('letterShowed', {x: this.x, y: this.y});
             }
 
             if (engravingText.p.isBitsFell) clearInterval(isInt);
@@ -107,7 +110,8 @@ engravingText.LoaderLetters = class {
         }, this.speed);
 
     }
-    createAims () {
+
+    createAims() {
         let objList = [];
         this.typingCenter.find('i').each(function (n) {
             let s = $(this); // s = symbol
@@ -136,22 +140,22 @@ engravingText.addBits = function (positions) {
     }
 };
 engravingText.animationBits = function () {
-    setInterval( () => {
+    setInterval(() => {
+        //if (isPaused) return;
         engravingText.clearCanvas();
         engravingText.updateBit();
-    },this.p.bitsSpeed)
+    }, this.p.bitsSpeed)
 };
 
 
 engravingText.Bit = class {
-    constructor (currentX, currentY) {
+    constructor(currentX, currentY) {
         this.x = currentX || 0;
         this.y = currentY || 0;
-
-        this.g = -Math.round( Math.random() * 50) / 10; // gravity
+        this.g = -Math.round(Math.random() * 50) / 10; // gravity
     }
 
-    draw () {
+    draw() {
         let p = engravingText.p;
         p.ctx.fillStyle = '#fff';
         let size = Math.random() * 3 + 1;
@@ -172,7 +176,7 @@ engravingText.updateBit = function () {
         b.y -= b.g;
         b.g -= 0.1;
 
-        if (this.p.H < b.y) bits.splice(j,1);
+        if (this.p.H < b.y) bits.splice(j, 1);
         b.draw();
     }
 
